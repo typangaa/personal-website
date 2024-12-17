@@ -1,0 +1,30 @@
+# Development Dockerfile
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install dependencies for development
+RUN apk add --no-cache libc6-compat
+
+# Install create-next-app globally with specific version
+RUN npm install -g create-next-app@15.1.0
+
+# Create a non-root user
+RUN addgroup -g 1001 nodeuser && \
+    adduser -D -u 1001 -G nodeuser nodeuser
+
+# Set npm config to save exact versions and increase timeout
+RUN npm config set save-exact=true && \
+    npm config set timeout=60000
+
+# Give nodeuser permissions
+RUN chown -R nodeuser:nodeuser /app
+
+# Switch to non-root user
+USER nodeuser
+
+# Initialize script that will log more verbosely
+COPY --chown=nodeuser:nodeuser init.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/init.sh
+
+CMD ["init.sh"]

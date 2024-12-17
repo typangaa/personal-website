@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  web-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - .:/app:rw
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - WATCHPACK_POLLING=true
+    user: "1001:1001"
+    tty: true
+
+  web-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
